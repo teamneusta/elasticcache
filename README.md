@@ -32,7 +32,7 @@ The following options can be set:
 	 'caching' => [
 		 'cacheConfigurations' => [
 			 'my_cache' => [
-				 'backend' => 'Neusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
+				 'backend' => 'TeamNeusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
 				 'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\VariableFrontend',
 				 'options' => [
 					 'defaultLifetime' => 0,
