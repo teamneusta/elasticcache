@@ -11,12 +11,12 @@
     },
     "autoload": {
         "psr-4": {
-            "\\TeamNeusta\\Elasticcache\\": "Classes/"
+            "TeamNeusta\\Elasticcache\\": "Classes/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "\\TeamNeusta\\Elasticcache\\Tests\\": "Tests/"
+            "TeamNeusta\\Elasticcache\\Tests\\": "Tests/"
         }
     }
 }
