@@ -1,5 +1,5 @@
 {
-    "name": "neusta/elasticcache",
+    "name": "teamneusta/elasticcache",
     "type": "typo3-cms-extension",
     "description": "elastic cache backend",
     "homepage": "https://www.neusta.com",
