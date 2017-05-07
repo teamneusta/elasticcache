@@ -9,7 +9,7 @@ Provides a cache backend for TYPO3 which enables storing caches in elasticsearch
 
 ## Installation
 
-`composer require neusta/elasticcache`
+`composer require teamneusta/elasticcache`
 
 ## Configuration
 
