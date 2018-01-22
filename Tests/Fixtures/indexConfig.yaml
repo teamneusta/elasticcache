@@ -1,0 +1,20 @@
+settings:
+  number_of_shards: 5,
+  analysis:
+    analyzer:
+      customAnalyzer:
+        filter:
+          - lowercase
+          - german_stemmer
+        type: custom
+        tokenizer: standard
+    filter:
+      german_stemmer:
+        type: stemmer
+        language: minimal_german
+mappings:
+  cacheEntry:
+    properties:
+      text_field:
+        type: string
+        analyzer: customAnalyzer

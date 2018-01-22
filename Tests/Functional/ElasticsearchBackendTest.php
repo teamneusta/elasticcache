@@ -6,12 +6,15 @@ namespace TeamNeusta\Elasticcache\Tests\Functional;
 use Elastica\Client;
 use Elastica\Exception\NotFoundException;
 use Elastica\Query\MatchAll;
+use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 
-class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
+class ElasticsearchBackendTest extends TestCase
 {
 
     protected $cacheConfiguration;
+
     /**
      * @var Client
      */
@@ -19,13 +22,16 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->cacheConfiguration = [ 'functesting' => [
-            'backend'  => 'Neusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
-            'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend',
-            'options'  => [
-                'indexName' => 'functest',
-            ],
-        ]];
+        $this->cacheConfiguration = [
+            'functesting' => [
+                'backend'  => 'TeamNeusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
+                'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend',
+                'options'  => [
+                    'indexName'          => 'functest',
+                    'indexConfiguration' => 'EXT:elasticcache/Tests/Fixtures/indexConfig.yaml'
+                ],
+            ]
+        ];
 
         $this->client = new Client();
     }
@@ -34,6 +40,7 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
     {
         $this->client->getIndex('functest')->delete();
     }
+
     /**
      * @test
      * @return void
@@ -52,6 +59,32 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @test
+     * @return void
+     */
+    public function elasticIndexWillBeCreatedWithYAMLIndexConfigurationIfItDoesNotExist()
+    {
+        $index = $this->client->getIndex('functest');
+        $this->assertFalse($index->exists());
+        $expectedMapping = [
+            'cacheEntry' => [
+                'properties' => [
+                    'text_field' => [
+                        'type'     => 'string',
+                        'analyzer' => 'customAnalyzer'
+                    ]
+                ]
+            ]
+        ];
+
+        $cacheManager = new CacheManager();
+        $cacheManager->setCacheConfigurations($this->cacheConfiguration);
+        $cacheManager->getCache('functesting');
+
+        $this->assertSame($expectedMapping, $index->getMapping());
+    }
+
+    /**
+     * @test
      */
     public function setAndGetAddEntryToTheCacheAndRetrieveIt()
     {
@@ -61,6 +94,29 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
         $entry = $cache->get('my_test_identifier');
 
         $this->assertSame('mytestdata', $entry);
+    }
+
+    /**
+     * @test
+     */
+    public function overwriteTypeNameOnIndexCreation()
+    {
+        $cacheConfiguration = [
+            'functesting' => [
+                'backend'  => 'TeamNeusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
+                'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend',
+                'options'  => [
+                    'indexName' => 'functest',
+                    'typeName'  => 'customType'
+                ],
+            ]
+        ];
+
+        $cacheManager = new CacheManager();
+        $cacheManager->setCacheConfigurations($cacheConfiguration);
+        $cache = $cacheManager->getCache('functesting');
+
+        $this->assertSame('customType', $cache->getBackend()->getType()->getName());
     }
 
     /**
@@ -155,7 +211,6 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
         self::assertSame(0, $count);
     }
 
-
     /**
      * @test
      * @return void
@@ -167,13 +222,13 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
         $cache->set('my_test_identifier1', 'mytestdata', ['test_tag'], 1500);
         $cache->set('my_test_identifier2', 'mytestdata', ['test_tag'], 1500);
         $cache->set('my_test_identifier3', 'mytestdata', ['test_tag'], 1);
-        sleep(1);
+        sleep(2);
 
         $count = $this->client->getIndex('functest')->getType('cacheEntry')->search(new MatchAll())->count();
         self::assertSame(4, $count);
 
         $cache->collectGarbage();
-        sleep(1);
+        sleep(2);
 
         $count = $this->client->getIndex('functest')->getType('cacheEntry')->search(new MatchAll())->count();
         self::assertSame(2, $count);
@@ -228,13 +283,14 @@ class ElasticsearchBackendTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+     * @return FrontendInterface
      */
-    protected function createCache(): \TYPO3\CMS\Core\Cache\Frontend\FrontendInterface
+    protected function createCache(): FrontendInterface
     {
         $cacheManager = new CacheManager();
         $cacheManager->setCacheConfigurations($this->cacheConfiguration);
         $cache = $cacheManager->getCache('functesting');
+
         return $cache;
     }
 }
