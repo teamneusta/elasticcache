@@ -5,7 +5,7 @@
     "homepage": "https://www.neusta.com",
     "license": ["GPL-2.0+"],
     "keywords": ["elasticsearch", "cache", "typo3"],
-    "version": "1.2.0",
+    "version": "1.0.0",
     "require": {
         "ruflin/elastica": "^3.2"
     },
