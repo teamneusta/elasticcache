@@ -12,6 +12,8 @@ use Elastica\Query\Range;
 use Elastica\Search;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\Backend\TaggableBackendInterface;
+use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 
 class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInterface
 {
@@ -29,7 +31,6 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      * @var string
      */
     protected $typeName = 'cacheEntry';
-
 
     /**
      * Elastica Client
@@ -49,46 +50,6 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      * @var \Elastica\Type
      */
     protected $type;
-
-    /**
-     * @param string $hostname
-     */
-    public function setHostname(string $hostname)
-    {
-        $this->hostname = $hostname;
-    }
-
-    /**
-     * @param string $indexName
-     */
-    public function setIndexName(string $indexName)
-    {
-        $this->indexName = $indexName;
-    }
-
-    /**
-     * @param int $port
-     */
-    public function setPort(int $port)
-    {
-        $this->port = $port;
-    }
-
-    /**
-     * @param string $path
-     */
-    public function setPath(string $path)
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @param string $transport
-     */
-    public function setTransport(string $transport)
-    {
-        $this->transport = $transport;
-    }
 
     /**
      * Elasticsearch port
@@ -118,6 +79,94 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      */
     protected $indexName = 't3cache';
 
+    /**
+     * Path to index configuration yaml
+     * Example: EXT:myext/Configuration/Elastic/indexConfiguration.yaml
+     *
+     * @var string
+     */
+    protected $indexConfiguration = '';
+
+    /**
+     * @return \Elastica\Type
+     */
+    public function getType(): \Elastica\Type
+    {
+        return $this->type;
+    }
+
+    /**
+     * @return \Elastica\Index
+     */
+    public function getIndex(): \Elastica\Index
+    {
+        return $this->index;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIndexConfiguration(): string
+    {
+        return $this->indexConfiguration;
+    }
+
+    /**
+     * @param string $hostname
+     */
+    public function setHostname(string $hostname)
+    {
+        $this->hostname = $hostname;
+    }
+
+    /**
+     * @param string $indexName
+     */
+    public function setIndexName(string $indexName)
+    {
+        $this->indexName = $indexName;
+    }
+
+    /**
+     * @param string $indexConfiguration
+     */
+    public function setIndexConfiguration(string $indexConfiguration)
+    {
+        $this->indexConfiguration = $indexConfiguration;
+    }
+
+    /**
+     * @param string $typeName
+     */
+    public function setTypeName(string $typeName)
+    {
+        $this->typeName = $typeName;
+    }
+
+    /**
+     * @param int $port
+     */
+    public function setPort(int $port)
+    {
+        $this->port = $port;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function setPath(string $path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @param string $transport
+     */
+    public function setTransport(string $transport)
+    {
+        $this->transport = $transport;
+    }
+
     public function initializeObject()
     {
         $this->elastica = new Client(
@@ -131,7 +180,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
         $this->index = $this->elastica->getIndex($this->indexName);
         $this->type = $this->index->getType($this->typeName);
         if (!$this->index->exists()) {
-            $this->index->create();
+            $this->createIndex();
             // add wait time until index was created before writing
             sleep(2);
         }
@@ -142,7 +191,8 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      *
      * @param string $entryIdentifier An identifier for this specific cache entry
      * @param string $data            The data to be stored
-     * @param array  $tags            Tags to associate with this cache entry. If the backend does not support tags, this option can be ignored.
+     * @param array  $tags            Tags to associate with this cache entry. If the backend does not support tags, this option
+     *                                can be ignored.
      * @param int    $lifetime        Lifetime of this cache entry in seconds. "0" means unlimited lifetime.
      *
      * @throws \TYPO3\CMS\Core\Cache\Exception if no cache frontend has been set.
@@ -157,7 +207,11 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
         }
         $document = new Document(
             $entryIdentifier,
-            ['content' => $data, '_tags' => $tags, '_lifetime' => $lifetime],
+            [
+                'content'   => $data,
+                '_tags'     => $tags,
+                '_lifetime' => $lifetime
+            ],
             $this->typeName
         );
         $this->index->addDocuments([$document]);
@@ -199,7 +253,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      * @return bool TRUE if such an entry exists, FALSE if not
      * @api
      */
-    public function has($entryIdentifier)
+    public function has($entryIdentifier): bool
     {
         try {
             return (bool)$this->getEntryWithLifeTimeCheck($entryIdentifier);
@@ -222,6 +276,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
     {
         if ($this->has($entryIdentifier)) {
             $this->type->deleteById($entryIdentifier);
+
             return true;
         } else {
             return false;
@@ -248,7 +303,10 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
     public function collectGarbage()
     {
         $range = new Range();
-        $range->addField('_lifetime', ['from' => 1, 'to' => time()]);
+        $range->addField('_lifetime', [
+            'from' => 1,
+            'to'   => time()
+        ]);
         $this->type->deleteByQuery($range);
     }
 
@@ -268,7 +326,6 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
     /**
      * Finds and returns all cache entry identifiers which are tagged by the
      * specified tag
-     *
      * elasticsearch scan and scroll is used to make sure all matching entries are returned independent from the limit
      * of results per page
      *
@@ -277,7 +334,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
      * @return array An array with identifiers of all matching entries. An empty array if no entries matched
      * @api
      */
-    public function findIdentifiersByTag($tag)
+    public function findIdentifiersByTag($tag): array
     {
         $query = new Match('_tags', $tag);
         $search = new Search($this->elastica);
@@ -290,6 +347,36 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
                 $identifiers[] = $document->getId();
             }
         }
+
         return $identifiers;
+    }
+
+    /**
+     * parses index configuration from yaml file into an array
+     *
+     * @return array
+     */
+    private function parseIndexConfiguration(): array
+    {
+        $configuration = [];
+        $indexConfigurationFile = $this->getIndexConfiguration();
+        if ($indexConfigurationFile !== '') {
+            $fileLoader = GeneralUtility::makeInstance(YamlFileLoader::class);
+            $configuration = $fileLoader->load($indexConfigurationFile);
+        }
+
+        return $configuration;
+    }
+
+    /**
+     * creates new index with predefined configuration
+     *
+     * @return \Elastica\Response
+     */
+    private function createIndex(): \Elastica\Response
+    {
+        $indexConfiguration = $this->parseIndexConfiguration();
+
+        return $this->index->create($indexConfiguration);
     }
 }

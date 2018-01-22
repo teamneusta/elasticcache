@@ -23,6 +23,8 @@ The following options can be set:
 * `path`: The elasticsearch path (defaults to `/`)
 * `transport`: The elasticsearch transport protocol (defaults to `http`)
 * `indexName`: The index name to use for this cache - make sure to choose a different one per cache
+* `typeName`: The type name to use for this index
+* `indexConfiguration`: The path to index configuration where you can set alternating mappings and analyzers
 * `defaultLifeTime`: The default lifetime of a cache entry in this cache (in seconds - 0 means unlimited)
 
 ### Example
@@ -37,6 +39,8 @@ The following options can be set:
 				 'options' => [
 					 'defaultLifetime' => 0,
 					 'indexName' => 'my_cache_index_name'
+					 'typeName' => 'my_cache_type_name'
+					 'indexConfiguration' => 'EXT:myext/Configuration/Elastic/indexConfiguration.yaml'
 				 ],
 			 ],
 		 ],
