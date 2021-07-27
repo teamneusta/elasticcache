@@ -5,9 +5,14 @@
     "homepage": "https://www.neusta.com",
     "license": ["GPL-2.0-or-later"],
     "keywords": ["elasticsearch", "cache", "typo3"],
-    "version": "1.1.0",
+    "version": "1.2.0",
     "require": {
         "ruflin/elastica": "^3.2"
+    },
+    "extra": {
+        "typo3/cms": {
+            "extension-key": "elasticcache"
+        }
     },
     "autoload": {
         "psr-4": {
