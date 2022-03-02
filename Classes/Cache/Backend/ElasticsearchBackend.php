@@ -12,10 +12,11 @@ use Elastica\Query\Range;
 use Elastica\Search;
 use TYPO3\CMS\Core\Cache\Backend\AbstractBackend;
 use TYPO3\CMS\Core\Cache\Backend\TaggableBackendInterface;
+use TYPO3\CMS\Core\Cache\Backend\TransientBackendInterface;
 use TYPO3\CMS\Core\Configuration\Loader\YamlFileLoader;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 
-class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInterface
+class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInterface, TransientBackendInterface
 {
 
     /**
