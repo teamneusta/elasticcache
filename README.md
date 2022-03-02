@@ -50,3 +50,12 @@ The following options can be set:
 ## Issues and Feedback
 
 If you run into any issues, want to contribute or just give feedback, just use the github issue tracker.
+
+### Known issues
+
+With TYPO3 10.0 the `StringFrontend` has been removed [after being deprecated in TYPO3 9.2](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/9.2/Deprecation-81434-StringCacheFrontendDeprecated.html).  
+It is recommended to use [the `VariableFrontend` instead](https://docs.typo3.org/c/typo3/cms-core/main/en-us/Changelog/9.2/Deprecation-81434-StringCacheFrontendDeprecated.html).
+However, the `VariableFrontend` serializes the cache input per default unless the corresponding cache backend implements
+the `TransientBackendInterface`. To this extend the elasticcache-extension changes to the use of the `TransientBackendInterface`
+with v2.0 to allow insertion of valid json for cross-platform usage.
+
