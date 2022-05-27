@@ -8,19 +8,18 @@ use Elastica\Exception\NotFoundException;
 use Elastica\Query\MatchAll;
 use PHPUnit\Framework\TestCase;
 use TYPO3\CMS\Core\Cache\CacheManager;
+use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
 
 class ElasticsearchBackendTest extends TestCase
 {
-
-    protected $cacheConfiguration;
-
     /**
-     * @var Client
+     * @var array[]
      */
-    protected $client;
+    protected array $cacheConfiguration;
+    protected Client $client;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->cacheConfiguration = [
             'functesting' => [
@@ -36,16 +35,15 @@ class ElasticsearchBackendTest extends TestCase
         $this->client = new Client();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->client->getIndex('functest')->delete();
     }
 
     /**
      * @test
-     * @return void
      */
-    public function elasticIndexWillBeCreatedIfItDoesNotExist()
+    public function elasticIndexWillBeCreatedIfItDoesNotExist(): void
     {
         $index = $this->client->getIndex('functest');
         $this->assertFalse($index->exists());
@@ -59,9 +57,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function elasticIndexWillBeCreatedWithYAMLIndexConfigurationIfItDoesNotExist()
+    public function elasticIndexWillBeCreatedWithYAMLIndexConfigurationIfItDoesNotExist(): void
     {
         $index = $this->client->getIndex('functest');
         $this->assertFalse($index->exists());
@@ -86,7 +83,7 @@ class ElasticsearchBackendTest extends TestCase
     /**
      * @test
      */
-    public function setAndGetAddEntryToTheCacheAndRetrieveIt()
+    public function setAndGetAddEntryToTheCacheAndRetrieveIt(): void
     {
         $cache = $this->createCache();
 
@@ -99,7 +96,7 @@ class ElasticsearchBackendTest extends TestCase
     /**
      * @test
      */
-    public function overwriteTypeNameOnIndexCreation()
+    public function overwriteTypeNameOnIndexCreation(): void
     {
         $cacheConfiguration = [
             'functesting' => [
@@ -121,9 +118,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function getEntryReturnsFalseIfNoEntryIsFound()
+    public function getEntryReturnsFalseIfNoEntryIsFound(): void
     {
         $cache = $this->createCache();
         $entry = $cache->get('not_found_identifier');
@@ -133,9 +129,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function getEntryReturnsFalseIfLifetimeOfEntryIsLessThanNow()
+    public function getEntryReturnsFalseIfLifetimeOfEntryIsLessThanNow(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -148,9 +143,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function hasReturnsFalseIfNoEntryIsFound()
+    public function hasReturnsFalseIfNoEntryIsFound(): void
     {
         $cache = $this->createCache();
         $entry = $cache->has('not_found_identifier');
@@ -160,9 +154,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function hasReturnsFalseIfLifeTimeOfEntryIsLessThanNow()
+    public function hasReturnsFalseIfLifeTimeOfEntryIsLessThanNow(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -175,9 +168,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function removeDeletesEntryFromCache()
+    public function removeDeletesEntryFromCache(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -190,9 +182,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function flushRemovesAllCacheEntries()
+    public function flushRemovesAllCacheEntries(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -213,9 +204,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function collectGarbageDeletesExpiredCacheEntries()
+    public function collectGarbageDeletesExpiredCacheEntries(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -236,9 +226,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function flushByTagRemovesEntriesWithSpecifiedTag()
+    public function flushByTagRemovesEntriesWithSpecifiedTag(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -259,9 +248,8 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @test
-     * @return void
      */
-    public function findIdentifiersByTagReturnsTaggedDocumentIdentifiers()
+    public function findIdentifiersByTagReturnsTaggedDocumentIdentifiers(): void
     {
         $cache = $this->createCache();
         $cache->set('my_test_identifier', 'mytestdata', ['test_tag'], 1);
@@ -284,13 +272,13 @@ class ElasticsearchBackendTest extends TestCase
 
     /**
      * @return FrontendInterface
+     * @throws NoSuchCacheException
      */
     protected function createCache(): FrontendInterface
     {
         $cacheManager = new CacheManager();
         $cacheManager->setCacheConfigurations($this->cacheConfiguration);
-        $cache = $cacheManager->getCache('functesting');
 
-        return $cache;
+        return $cacheManager->getCache('functesting');
     }
 }

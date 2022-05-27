@@ -5,8 +5,10 @@
     "homepage": "https://www.neusta.com",
     "license": ["GPL-2.0-or-later"],
     "keywords": ["elasticsearch", "cache", "typo3"],
-    "version": "2.0.0",
+    "version": "3.0.0",
     "require": {
+        "php": ">=7.4",
+        "typo3/cms-core": "^10.4 || ^11.5",
         "ruflin/elastica": "^3.2"
     },
     "extra": {
@@ -22,6 +24,12 @@
     "autoload-dev": {
         "psr-4": {
             "TeamNeusta\\Elasticcache\\Tests\\": "Tests/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "typo3/cms-composer-installers": true,
+            "typo3/class-alias-loader": true
         }
     }
 }
