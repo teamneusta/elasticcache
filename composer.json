@@ -19,7 +19,7 @@
             "email": "t.kretschmann@neusta.de"
         }
     ],
-    "version": "1.3.0",
+    "version": "2.1.0",
     "require": {
         "ruflin/elastica": "^3.2"
     },
