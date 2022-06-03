@@ -5,7 +5,21 @@
     "homepage": "https://www.neusta.com",
     "license": ["GPL-2.0-or-later"],
     "keywords": ["elasticsearch", "cache", "typo3"],
-    "version": "2.0.0",
+    "authors": [
+        {
+            "name": "Susanne Moog",
+            "email": "s.moog@neusta.de"
+        },
+        {
+            "name": "Steffen Frese",
+            "email": "s.frese@neusta.de"
+        },
+        {
+            "name": "Tobias Kretschmann",
+            "email": "t.kretschmann@neusta.de"
+        }
+    ],
+    "version": "2.1.0",
     "require": {
         "ruflin/elastica": "^3.2"
     },
