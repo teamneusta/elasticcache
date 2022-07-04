@@ -185,11 +185,12 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
     {
         $entry = $this->type->getDocument($entryIdentifier);
         $data = $entry->getData();
+        $content = false;
         if ($data['_lifetime'] === 0 || $data['_lifetime'] > time()) {
-            return $data['content'];
-        } else {
-            return false;
+            $content = $data['content'];
         }
+
+        return $content;
     }
 
     /**
@@ -279,7 +280,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
         $search = new Search($this->elastica);
         $search->search($query);
         $identifiers = [];
-        foreach ($search->scanAndScroll() as $scrollId => $resultSet) {
+        foreach ($search->scroll() as $resultSet) {
             $documents = $resultSet->getDocuments();
             foreach ($documents as $document) {
                 /** @var Document $document Document */
