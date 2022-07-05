@@ -1,5 +1,5 @@
 {
-    "name": "teamneusta/elasticcache",
+    "name": "test/elasticcache",
     "type": "typo3-cms-extension",
     "description": "elastic cache backend",
     "homepage": "https://www.neusta.com",
@@ -19,11 +19,11 @@
             "email": "t.kretschmann@neusta.de"
         }
     ],
-    "version": "5.0.0",
+    "version": "6.0.0",
     "require": {
         "php": ">=7.4",
         "typo3/cms-core": "^10.4 || ^11.5",
-        "ruflin/elastica": "^5.0"
+        "ruflin/elastica": "^6.0"
     },
     "extra": {
         "typo3/cms": {
