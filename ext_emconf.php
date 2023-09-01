@@ -8,7 +8,7 @@ $EM_CONF[$_EXTKEY] = [
     'category'         => 'extension',
     'constraints'      => [
         'depends'   => [
-            'typo3' => '8.6.0-11.99.99'
+            'typo3' => '11.5.0-12.99.99'
         ],
         'conflicts' => [
         ],
@@ -19,9 +19,8 @@ $EM_CONF[$_EXTKEY] = [
         ],
     ],
     'state'            => 'stable',
-    'clearCacheOnLoad' => 1,
     'author'           => 'Susanne Moog, Steffen Frese, Tobias Kretschmann',
     'author_email'     => 's.moog@neusta.de, s.frese@neusta.de, t.kretschmann@neusta.de',
     'author_company'   => 'Neusta GmbH',
-    'version'          => '2.1.0',
+    'version'          => '8.0.0',
 ];
