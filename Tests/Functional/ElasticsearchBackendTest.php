@@ -7,6 +7,7 @@ use Elastica\Client;
 use Elastica\Exception\NotFoundException;
 use Elastica\Query\MatchAll;
 use PHPUnit\Framework\TestCase;
+use TeamNeusta\Elasticcache\Cache\Backend\ElasticsearchBackend;
 use TYPO3\CMS\Core\Cache\CacheManager;
 use TYPO3\CMS\Core\Cache\Exception\NoSuchCacheException;
 use TYPO3\CMS\Core\Cache\Frontend\FrontendInterface;
@@ -23,7 +24,7 @@ class ElasticsearchBackendTest extends TestCase
     {
         $this->cacheConfiguration = [
             'functesting' => [
-                'backend'  => 'TeamNeusta\\Elasticcache\\Cache\\Backend\\ElasticsearchBackend',
+                'backend'  => ElasticsearchBackend::class,
                 'frontend' => 'TYPO3\\CMS\\Core\\Cache\\Frontend\\StringFrontend',
                 'options'  => [
                     'indexName'          => 'functest',
