@@ -271,7 +271,7 @@ class ElasticsearchBackend extends AbstractBackend implements TaggableBackendInt
         $data = $entry->getData();
         $content = false;
         if (is_array($data) && ($data['_lifetime'] === 0 || $data['_lifetime'] > time())) {
-            $content = $data['content'];
+            $content = $data['content'] ?? false;
         }
 
         return $content;
