@@ -4,8 +4,8 @@ Elasticsearch based cache backend for TYPO3
 Provides a cache backend for TYPO3 which enables storing caches in elasticsearch. 
 
 ## Prerequisites
-* Currently only tested with elasticsearch 2.x
-* The "delete-by-query" plugin needs to be installed (see https://www.elastic.co/guide/en/elasticsearch/plugins/2.0/plugins-delete-by-query.html)
+* Currently tested with elasticsearch 2.x, 5.x, 6.x and 7.x
+* The "delete-by-query" plugin may be needed for 2.x to be installed (see https://www.elastic.co/guide/en/elasticsearch/plugins/2.0/plugins-delete-by-query.html)
 
 ## Installation
 
