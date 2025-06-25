@@ -17,12 +17,16 @@
         {
             "name": "Tobias Kretschmann",
             "email": "t.kretschmann@neusta.de"
+        },
+        {
+            "name": "Malek Olabi",
+            "email": "m.olabi@neusta.de"
         }
     ],
-    "version": "8.0.1",
+    "version": "8.1.0",
     "require": {
-        "php": ">=8.0",
-        "typo3/cms-core": "^11.5 || ^12.4",
+        "php": ">=8.2",
+        "typo3/cms-core": "^11.5 || ^12.4 || ^13.4",
         "ruflin/elastica": "^7.0"
     },
     "extra": {
